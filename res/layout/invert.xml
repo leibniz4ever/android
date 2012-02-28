@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    android:id="@+id/linearLayout1"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:id="@+id/invertImageView"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_weight="0.30"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="50dp"
+        android:layout_width="fill_parent">
+	    <CheckBox
+	        android:id="@+id/invert"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:onClick="invert"
+	        android:text="@string/invert" />
+	    <CheckBox
+	        android:id="@+id/grayscale"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:onClick="invert"
+	        android:text="@string/grayscale" />
+	</LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="50dp"
+        android:layout_width="fill_parent">
+        <Button
+            android:layout_height="fill_parent"
+            android:layout_width="70dp"
+            android:text="@string/save"
+            android:onClick="save"/>
+        <Button
+            android:layout_height="fill_parent"
+            android:layout_width="70dp"
+            android:text="@string/saveAs"
+            android:onClick="saveAs"/>
+        <Button
+            android:layout_height="fill_parent"
+            android:layout_width="70dp"
+            android:text="@string/liveVideo"
+            android:onClick="video"/>
+        <Button
+            android:layout_height="fill_parent"
+            android:layout_width="70dp"
+            android:text="@string/videoServer"
+            android:onClick="videoServer"/>
+    </LinearLayout>
+</LinearLayout>

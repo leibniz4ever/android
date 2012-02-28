@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout
+	android:orientation="vertical"
+	android:layout_height="fill_parent"
+	android:layout_width="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	
+    <LinearLayout
+		android:orientation="vertical"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent"
+		android:layout_weight="0.3"
+		android:id="@+id/linearLayout1" >
+	    
+	    <ImageView
+	        android:src="@drawable/ic_launcher"
+		    android:layout_height="fill_parent"
+		    android:layout_width="fill_parent"
+		    android:id="@+id/mainImageView"
+		    android:layout_gravity="center_horizontal|top"
+		    android:contentDescription="@string/def"
+		    android:layout_weight="0.30"/>
+	    
+    </LinearLayout>
+	
+	<LinearLayout
+	    android:orientation="horizontal"
+	    android:layout_height="wrap_content"
+	    android:layout_width="wrap_content"
+	    android:layout_gravity="center_horizontal|bottom"
+	    android:layout_marginBottom="20dip">
+	    
+	    <Button
+	        android:layout_height="wrap_content"
+	        android:layout_width="wrap_content"
+	        android:text="@string/takePicture"
+	        android:padding="12dip"
+	        android:onClick="toCamera"/>
+	    <Button
+	        android:layout_height="wrap_content"
+	        android:layout_width="wrap_content"
+	        android:text="@string/loadPicture"
+	        android:padding="12dip"
+	        android:onClick="toGallery"/>
+	    <Button
+	        android:layout_height="wrap_content"
+	        android:layout_width="wrap_content"
+	        android:text="@string/algorithms"
+	        android:padding="12dip"
+	        android:onClick="toAlg"/>
+	</LinearLayout>
+	
+</LinearLayout>

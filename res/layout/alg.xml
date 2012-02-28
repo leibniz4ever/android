@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ScrollView
+    android:fillViewport="true"
+    android:background="@color/translucent"
+    android:layout_height="wrap_content"
+    android:layout_width="fill_parent"
+    android:id="@+id/scroller"
+    xmlns:android="http://schemas.android.com/apk/res/android"> 
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:src="@drawable/ic_launcher"
+                android:contentDescription="@string/brightnesscontrast"/>
+            <Button
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:onClick="toAlg1"
+                android:text="@string/brightnesscontrast"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:src="@drawable/ic_launcher"
+                android:contentDescription="@string/invertimage"/>
+            <Button
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:onClick="toAlg2"
+                android:text="@string/invertimage"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
