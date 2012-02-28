@@ -16,13 +16,13 @@ public class Alg extends Activity {
     }
  
     public void toAlg1(View view) {
-         Intent i = new Intent(this, Alg1.class);
+         Intent i = new Intent(this, BrightnessContrast.class);
          this.startActivity(i);
          this.finish();
     }
  
     public void toAlg2(View view) {
-         Intent i = new Intent(this, Alg2.class);
+         Intent i = new Intent(this, Invert.class);
          this.startActivity(i);
          this.finish();
     }

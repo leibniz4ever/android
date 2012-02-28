@@ -34,9 +34,7 @@ public class Main extends Activity {
 
     //called by button
     public void toCamera(View view) {
-    	Intent i = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);//MediaStore.ACTION_IMAGE_CAPTURE);
-    	//cm.loadMainImage(findMostRecentImage());
-    	//i.setType("image/*");
+    	Intent i = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
     	startActivityForResult(i, CAMERA_PICTURE);
     }
 
@@ -51,22 +49,10 @@ public class Main extends Activity {
     
     //called by button
     public void toAlg(View view) {
-        //String down = Native.Down(Main.image);
-        //int[] pixels = getPixels(Main.image);
-        //for(int i = 0; i<pixels.length; i++) {
-        //	pixels[i] = funct(pixels[i]);
-        //}
-        //int width = Main.image.getWidth();
-        //int height = Main.image.getHeight();
-        //try {
-        //Main.image.setPixels(pixels, 0, width, 1, 1, width-1, height-1);
-        //} catch(Exception e) {
-        //	e.printStackTrace();
-        //} catch (Error e) {
-        //	e.printStackTrace();
-        //}
-    	Intent i = new Intent(this, Alg.class);
-    	this.startActivity(i);
+    	if(cm.hasMainImage()) {
+	    	Intent i = new Intent(this, Alg.class);
+	    	this.startActivity(i);
+    	}
     }
 
 	//called after an intent has returned its value
@@ -81,27 +67,10 @@ public class Main extends Activity {
     
     //from a forum
     public String getImagePath(Uri uri) {
-        String[] projection = { MediaStore.Images.Media.DATA };
-        Cursor cursor = managedQuery(uri, projection, null, null, null);
-        if(cursor!=null)
-        {
-            //HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
-            //THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
-            int column_index = cursor
-            .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        }
-        else return null;
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = managedQuery(uri, proj, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
     }
-    
-//    //this makes the bitmap much easier
-//    private static int[] getPixels(Bitmap bm) {
-//		int[] pixels;
-//		int height = bm.getHeight();
-//	    int width = bm.getWidth();
-//	    pixels = new int[height * width];
-//	    bm.getPixels(pixels, 0, width, 0, 0, width, height);
-//	    return pixels;
-//    }
 }

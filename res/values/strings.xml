@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name">The Overfitters</string>
-    <string name="brightnesscontrast">Brightness and Contrast</string>
-    <string name="invertimage">Invert Image</string>
+    <string name="brightnessContrast">Brightness and Contrast</string>
+    <string name="invertImage">Invert Image</string>
     <string name="def">Default Image</string>
     <string name="save">Save</string>
     <string name="saveAs">Save As</string>
@@ -12,10 +12,14 @@
     <string name="algorithms">Algorithms</string>
     <string name="liveVideo">Live Video</string>
     <string name="videoServer">Process Video</string>
-    <string name="brightness">Brightness</string>
-    <string name="contrast">Contrast</string>
+    <string name="modBrightness">Mod Brightness by:</string>
+    <string name="currBrightness">    Current Brightness:</string>
+    <string name="contrast">Contrast:</string>
     <string name="loading">Loading</string>
     <string name="invert">Invert\t</string>
     <string name="grayscale">Grayscale</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="filename">Type the new filename</string>
    
 </resources>

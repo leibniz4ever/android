@@ -4,7 +4,6 @@
     android:background="@color/translucent"
     android:layout_height="wrap_content"
     android:layout_width="fill_parent"
-    android:id="@+id/scroller"
     xmlns:android="http://schemas.android.com/apk/res/android"> 
     <LinearLayout
         android:layout_height="wrap_content"
@@ -18,12 +17,12 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:src="@drawable/ic_launcher"
-                android:contentDescription="@string/brightnesscontrast"/>
+                android:contentDescription="@string/brightnessContrast"/>
             <Button
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:onClick="toAlg1"
-                android:text="@string/brightnesscontrast"/>
+                android:text="@string/brightnessContrast"/>
         </LinearLayout>
         <LinearLayout
             android:layout_height="wrap_content"
@@ -33,12 +32,12 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:src="@drawable/ic_launcher"
-                android:contentDescription="@string/invertimage"/>
+                android:contentDescription="@string/invertImage"/>
             <Button
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:onClick="toAlg2"
-                android:text="@string/invertimage"/>
+                android:text="@string/invertImage"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import com.theoverfitters.R;
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -11,12 +13,12 @@ import android.widget.ImageView;
 
 public class ContentManager {
 	
+	static final int LOCATION = 0;
 	private static ContentManager cm;
 	private Main main;
 	private String path;
-	private Bitmap jpg, bigImage, imuImage, image, imuGrayImage, grayImage, smallGray, def, loading;
-	private static final String temp = "temp.jpg";
-	private FileInputStream fis;
+	private Bitmap jpg, bigImage, imuImage, image, def, loading;
+	private boolean mainImageLoaded;
 	
 	private ContentManager(Main main) {
 		this.main = main;
@@ -35,13 +37,13 @@ public class ContentManager {
 	}
 	
 	public void loadMainImage(String absPath) {
+		mainImageLoaded = false;
 		if(absPath == null)
 			return;
 		path = absPath;
 		
 		main.iv = (ImageView) main.findViewById(R.id.mainImageView);
 		main.iv.setImageBitmap(loading);
-		main.iv.invalidate();
 		
 		(new Thread() {
 			public void run() {
@@ -53,6 +55,7 @@ public class ContentManager {
 	
 	private void loadMainImage() {
 		try {
+			//clean up memory
 			if(imuImage != null)
 				imuImage.recycle();
 			if(image != null)
@@ -61,23 +64,13 @@ public class ContentManager {
 				jpg.recycle();
 			if(bigImage != null)
 				bigImage.recycle();
-			if(imuGrayImage != null)
-				imuGrayImage.recycle();
-			if(grayImage != null)
-				grayImage.recycle();
-			if(smallGray != null)
-				smallGray.recycle();
 			imuImage = null;
 			image = null;
 			jpg = null;
 			bigImage = null;
-			imuGrayImage = null;
-			grayImage = null;
-			smallGray = null;
-			//System.gc();
 			
 			//now load in jpg
-			fis = new FileInputStream(path);
+			FileInputStream fis = new FileInputStream(path);
 			jpg = BitmapFactory.decodeStream(fis);
 			fis.close();
 			
@@ -85,28 +78,20 @@ public class ContentManager {
 			bigImage = jpg.copy(Bitmap.Config.ARGB_8888, true);
 			jpg.recycle();
 			jpg = null;
-			//System.gc();
 			
 			//now create a more manageable form of the big image
 			int width = bigImage.getWidth();
 			int height = bigImage.getHeight();
-			imuImage = Bitmap.createScaledBitmap(bigImage, width/2, height/2, true);
-			//imuImage = Bitmap.createBitmap(width/2, height/2, Bitmap.Config.ARGB_8888);
-			//String s = Native.reduceColored(bigImage, imuImage);
-			
-			//now create a gray scale version
-			imuGrayImage = Bitmap.createBitmap(width, height, Bitmap.Config.ALPHA_8);
-			Native.ToGray(bigImage, imuGrayImage);
+			imuImage = Bitmap.createScaledBitmap(bigImage, width/4, height/4, true);
 			
 			//now dispose of large version
 			bigImage.recycle();
 			bigImage = null;
-			//System.gc();
 			
 			//now, finally set small working copy as the image and redraw
 			main.runOnUiThread(new Runnable() {
 				public void run() {
-					finishImuImageSet();
+					finishMainImageSet();
 				}
 			});
 			
@@ -115,9 +100,9 @@ public class ContentManager {
 		}
 	}
 	
-	private void finishImuImageSet() {
+	private void finishMainImageSet() {
         main.iv.setImageBitmap(imuImage);
-        main.iv.invalidate();
+        mainImageLoaded = true;
 	}
 	
 	public Bitmap getNewImage(ImageView iv) {
@@ -129,10 +114,6 @@ public class ContentManager {
 		iv.setImageBitmap(image);
 		return image;
 	}
-	
-	public boolean isTemp() {
-		return path.equals(temp);
-	}
 
 	public void loadDefaultMainImage() {
 		String s = findMostRecentImage();
@@ -140,23 +121,6 @@ public class ContentManager {
 			loadMainImage(s);
 		else
 			main.iv.setImageBitmap(def);
-	}
-
-	public Bitmap getNewBigGrayImage() {
-		if(grayImage != null)
-			grayImage.recycle();
-		grayImage = null;
-		grayImage = imuGrayImage.copy(Bitmap.Config.ALPHA_8, true);
-		return this.grayImage;
-	}
-
-	public Bitmap getNewSmallGrayImage() {
-		if(smallGray != null)
-			smallGray.recycle();
-		smallGray = null;
-		smallGray = Bitmap.createBitmap(grayImage.getWidth()/2, grayImage.getHeight()/2, Bitmap.Config.ALPHA_8);
-		Native.ReduceGray(grayImage, smallGray);
-		return this.smallGray;
 	}
 
 	public Bitmap getImage() {
@@ -194,16 +158,36 @@ public class ContentManager {
 				}
 			}
 		}
-		return Environment.getExternalStorageDirectory() + "/DCIM/Camera/" + files[bestIndex];
+		return folder + "/" + files[bestIndex];
 	}
 
-	public Bitmap getSmallGrayImage() {
-		if(smallGray == null)
-			return getNewSmallGrayImage();
-		return smallGray;
+	public boolean hasMainImage() {
+		return imuImage != null && mainImageLoaded;
 	}
 
-	public Bitmap getImuGrayImage() {
-		return this.imuGrayImage;
+	public void runOnUiThread(Runnable runnable) {
+		main.runOnUiThread(runnable);
+	}
+
+	public void setImage(ImageView iv) {
+		iv.setImageBitmap(image);
+	}
+
+	public void saveAs(Activity activity) {
+    	Intent i = new Intent(activity, SaveAs.class);
+    	activity.startActivityForResult(i, LOCATION);
+	}
+
+	public void save() {
+		this.save(this.path);
+	}
+
+	void save(String newPath) {
+		//TODO
+	}
+
+	public Bitmap getNewImage() {
+		image = imuImage.copy(Bitmap.Config.ARGB_8888, true);
+		return image;
 	}
 }

@@ -37,10 +37,7 @@ obj/local/armeabi/objs-debug/Lib/Lib.o: jni/Lib.c \
  /home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/stdlib.h \
  /home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/alloca.h \
  /home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/strings.h \
- /home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/memory.h \
- jni/ImProc.c \
- /home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/stdio.h \
- /home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/math.h
+ /home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/memory.h
 
 /home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/pthread.h:
 
@@ -119,9 +116,3 @@ obj/local/armeabi/objs-debug/Lib/Lib.o: jni/Lib.c \
 /home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/strings.h:
 
 /home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/memory.h:
-
-jni/ImProc.c:
-
-/home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/stdio.h:
-
-/home/bgibson/android-ndk-r7/platforms/android-8/arch-arm/usr/include/math.h:

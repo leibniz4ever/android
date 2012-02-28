@@ -1,4 +1,5 @@
 
     <resources>
         <color name="translucent">#8FFFFFFF</color>
+        <color name="black">#FFFFFFFF</color>
     </resources>

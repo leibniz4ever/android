@@ -28,14 +28,20 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.overfitters.Alg1"
+            android:theme="@android:style/Theme.Translucent"
+            android:name="com.overfitters.SaveAs"
             android:screenOrientation="portrait"
-            android:label="@string/brightnesscontrast" >
+            android:label="@string/saveAs" >
         </activity>
         <activity
-            android:name="com.overfitters.Alg2"
+            android:name="com.overfitters.BrightnessContrast"
             android:screenOrientation="portrait"
-            android:label="@string/invertimage" >
+            android:label="@string/brightnessContrast" >
+        </activity>
+        <activity
+            android:name="com.overfitters.Invert"
+            android:screenOrientation="portrait"
+            android:label="@string/invertImage" >
         </activity>
     </application>
 

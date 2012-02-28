@@ -11,6 +11,7 @@ public final class R {
     public static final class attr {
     }
     public static final class color {
+        public static final int black=0x7f040001;
         public static final int translucent=0x7f040000;
     }
     public static final class drawable {
@@ -18,9 +19,10 @@ public final class R {
         public static final int loading2=0x7f020001;
     }
     public static final class id {
-        public static final int brightnessContrastImageView=0x7f060001;
-        public static final int brightnessSeekBar=0x7f060002;
-        public static final int brightnessText=0x7f060003;
+        public static final int brightnessContrastImageView=0x7f060000;
+        public static final int brightnessSeekBar=0x7f060001;
+        public static final int brightnessText1=0x7f060002;
+        public static final int brightnessText2=0x7f060003;
         public static final int buttonSave=0x7f060007;
         public static final int buttonSaveAs=0x7f060008;
         public static final int buttonVideo=0x7f060009;
@@ -33,27 +35,32 @@ public final class R {
         public static final int linearLayout1=0x7f06000b;
         public static final int linearLayout3=0x7f060006;
         public static final int mainImageView=0x7f06000f;
-        public static final int scroller=0x7f060000;
+        public static final int saveAsText=0x7f060010;
     }
     public static final class layout {
         public static final int alg=0x7f030000;
-        public static final int brightnesscontrast=0x7f030001;
+        public static final int brightness_contrast=0x7f030001;
         public static final int invert=0x7f030002;
         public static final int main=0x7f030003;
+        public static final int save_as=0x7f030004;
     }
     public static final class string {
         public static final int algorithms=0x7f050008;
         public static final int app_name=0x7f050000;
-        public static final int brightness=0x7f05000b;
-        public static final int brightnesscontrast=0x7f050001;
-        public static final int contrast=0x7f05000c;
+        public static final int brightnessContrast=0x7f050001;
+        public static final int cancel=0x7f050012;
+        public static final int contrast=0x7f05000d;
+        public static final int currBrightness=0x7f05000c;
         public static final int def=0x7f050003;
-        public static final int grayscale=0x7f05000f;
-        public static final int invert=0x7f05000e;
-        public static final int invertimage=0x7f050002;
+        public static final int filename=0x7f050013;
+        public static final int grayscale=0x7f050010;
+        public static final int invert=0x7f05000f;
+        public static final int invertImage=0x7f050002;
         public static final int liveVideo=0x7f050009;
         public static final int loadPicture=0x7f050007;
-        public static final int loading=0x7f05000d;
+        public static final int loading=0x7f05000e;
+        public static final int modBrightness=0x7f05000b;
+        public static final int ok=0x7f050011;
         public static final int save=0x7f050004;
         public static final int saveAs=0x7f050005;
         public static final int takePicture=0x7f050006;
