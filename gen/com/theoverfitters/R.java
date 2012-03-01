@@ -12,6 +12,7 @@ public final class R {
     }
     public static final class color {
         public static final int black=0x7f040001;
+        public static final int red=0x7f040002;
         public static final int translucent=0x7f040000;
     }
     public static final class drawable {
@@ -35,7 +36,8 @@ public final class R {
         public static final int linearLayout1=0x7f06000b;
         public static final int linearLayout3=0x7f060006;
         public static final int mainImageView=0x7f06000f;
-        public static final int saveAsText=0x7f060010;
+        public static final int saveAsText=0x7f060011;
+        public static final int saveAsWarning=0x7f060010;
     }
     public static final class layout {
         public static final int alg=0x7f030000;
@@ -63,6 +65,7 @@ public final class R {
         public static final int ok=0x7f050011;
         public static final int save=0x7f050004;
         public static final int saveAs=0x7f050005;
+        public static final int saving=0x7f050014;
         public static final int takePicture=0x7f050006;
         public static final int videoServer=0x7f05000a;
     }

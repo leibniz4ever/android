@@ -20,8 +20,9 @@ struct rgba {
 #endif
 #define pixel struct rgba
 
+//#define getGray(color) (0.3f * color.red + 0.59f*color.green + 0.11f*color.blue)
 #define getGray(color) (color.red + color.green + color.blue)/3
-pixel inline getColored(gray) {
+pixel inline getColored(unsigned char gray) {
   pixel pix;
   pix.red = pix.green = pix.blue = gray;
   return pix;
@@ -52,7 +53,7 @@ jint Java_com_overfitters_Native_ColorToGray(JNIEnv *env, jobject thiz, jobject 
   int i,j;
   for(i = 0; i<width; i++) {
     for(j = 0; j<height; j++) {
-      pixels[i+j*width] = getColored(getGray(pixels[i+j*width]));
+      pixels[i+j*width] = getColored((unsigned char)getGray(pixels[i+j*width]));
     }
   }
 
@@ -155,7 +156,7 @@ jint Java_com_overfitters_Native_InvertGray(JNIEnv *env, jobject thiz, jobject b
   int i,j;
   for(i = 0; i<width; i++) {
     for(j = 0; j<height; j++) {
-      pixels[i+j*width] = getColored(0xff ^ getGray(pixels[i+j*width]));
+      pixels[i+j*width] = getColored(0xff ^ (unsigned char)getGray(pixels[i+j*width]));
     }
   }
 

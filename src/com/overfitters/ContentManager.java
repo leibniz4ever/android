@@ -1,10 +1,11 @@
 package com.overfitters;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import com.theoverfitters.R;
-import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,13 +13,13 @@ import android.os.Environment;
 import android.widget.ImageView;
 
 public class ContentManager {
-	
-	static final int LOCATION = 0;
 	private static ContentManager cm;
 	private Main main;
-	private String path;
+	private String path, newPath;
 	private Bitmap jpg, bigImage, imuImage, image, def, loading;
 	private boolean mainImageLoaded;
+	private ImageProcessor currActivity;
+	private ProgressDialog progDialog;
 	
 	private ContentManager(Main main) {
 		this.main = main;
@@ -53,53 +54,57 @@ public class ContentManager {
 		}).start();
 	}
 	
-	private void loadMainImage() {
-		try {
-			//clean up memory
-			if(imuImage != null)
-				imuImage.recycle();
-			if(image != null)
-				image.recycle();
-			if(jpg != null)
-				jpg.recycle();
-			if(bigImage != null)
-				bigImage.recycle();
-			imuImage = null;
-			image = null;
-			jpg = null;
-			bigImage = null;
-			
-			//now load in jpg
-			FileInputStream fis = new FileInputStream(path);
-			jpg = BitmapFactory.decodeStream(fis);
-			fis.close();
-			
-			//convert jpg to bitmap and recycle jpg
-			bigImage = jpg.copy(Bitmap.Config.ARGB_8888, true);
+	private void cleanMem() {
+		if(imuImage != null)
+			imuImage.recycle();
+		if(image != null)
+			image.recycle();
+		if(jpg != null)
 			jpg.recycle();
-			jpg = null;
-			
-			//now create a more manageable form of the big image
-			int width = bigImage.getWidth();
-			int height = bigImage.getHeight();
-			imuImage = Bitmap.createScaledBitmap(bigImage, width/4, height/4, true);
-			
-			//now dispose of large version
+		if(bigImage != null)
 			bigImage.recycle();
-			bigImage = null;
-			
-			//now, finally set small working copy as the image and redraw
-			main.runOnUiThread(new Runnable() {
-				public void run() {
-					finishMainImageSet();
-				}
-			});
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		imuImage = null;
+		image = null;
+		jpg = null;
+		bigImage = null;
 	}
 	
+	private void loadMainImage() {
+		cleanMem();
+		
+		getNewBigImage();
+		
+		getNewImuImage();
+		
+		//now, finally set small working copy as the image and redraw
+		main.runOnUiThread(new Runnable() {
+			public void run() {
+				finishMainImageSet();
+			}
+		});
+	}
+	
+	private void getNewImuImage() {
+		//now create a more manageable form of the big image
+		int width = bigImage.getWidth();
+		int height = bigImage.getHeight();
+		imuImage = Bitmap.createScaledBitmap(bigImage, width/4, height/4, true);
+		
+		//now dispose of large version
+		bigImage.recycle();
+		bigImage = null;
+	}
+
+	private void getNewBigImage() {
+		//now load in jpg
+		jpg = BitmapFactory.decodeFile(path);
+		
+		//convert jpg to bitmap and recycle jpg
+		bigImage = jpg.copy(Bitmap.Config.ARGB_8888, true);
+		jpg.recycle();
+		jpg = null;
+	}
+
 	private void finishMainImageSet() {
         main.iv.setImageBitmap(imuImage);
         mainImageLoaded = true;
@@ -173,21 +178,90 @@ public class ContentManager {
 		iv.setImageBitmap(image);
 	}
 
-	public void saveAs(Activity activity) {
+	public void saveAs(ImageProcessor activity) {
     	Intent i = new Intent(activity, SaveAs.class);
-    	activity.startActivityForResult(i, LOCATION);
+    	this.currActivity = activity;
+    	activity.startActivity(i);
 	}
 
-	public void save() {
-		this.save(this.path);
+	//GUI thread
+	public boolean save(ImageProcessor ip) {
+		return this.save(ip, this.path);
 	}
 
-	void save(String newPath) {
-		//TODO
+	//GUI thread
+	private boolean save(ImageProcessor ip, String newPath) {
+		if(!newPath.endsWith(".jpg"))
+			newPath = newPath.trim() + ".jpg";
+		
+		if(!newPath.startsWith("/"))
+			newPath = Environment.getExternalStorageDirectory() + "/DCIM/Camera/" + newPath; 
+		
+		File file = new File(newPath);
+		try {
+			file.createNewFile();
+		} catch (IOException e1) {
+			return false;
+		}
+
+		currActivity = ip;
+		
+		progDialog = ProgressDialog.show(currActivity, "", currActivity.getText(R.string.saving), true, true);
+		
+		this.newPath = newPath;
+		
+		cleanMem();
+		
+		(new Thread() {
+			public void run() {
+				finishSave();
+			}
+		}).start();
+		
+		return true;
+	}
+	
+	public void finishSave() {
+		getNewBigImage();
+		
+		currActivity.processImage(bigImage);
+		
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(newPath);
+			bigImage.compress(Bitmap.CompressFormat.JPEG, 85, fos);
+			fos.close();
+			
+			path = newPath;
+			
+			getNewImuImage();
+			
+			ContentManager.this.runOnUiThread(new Runnable() {
+				public void run() {
+					main.iv.setImageBitmap(ContentManager.this.imuImage);
+					currActivity.reset();
+				}
+			});
+			
+			progDialog.dismiss();
+		} catch (FileNotFoundException e) {
+			progDialog.dismiss();
+		} catch (IOException e) {
+			progDialog.dismiss();
+		}
 	}
 
 	public Bitmap getNewImage() {
 		image = imuImage.copy(Bitmap.Config.ARGB_8888, true);
 		return image;
+	}
+
+	//GUI thread
+	public boolean saveTo(String file) {
+		return save(currActivity, file);
+	}
+	
+	public void onDestroy() {
+		currActivity = null;
 	}
 }

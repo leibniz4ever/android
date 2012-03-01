@@ -1,37 +1,30 @@
 package com.overfitters;
  
 import com.theoverfitters.R;
-
-import android.app.Activity;
-import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
  
-public class BrightnessContrast extends Activity {
-	private ContentManager cm;
+public class BrightnessContrast extends ImageProcessor {
+	private ImageView iv;
 	private TextView brText1, brText2, conText;
 	private SeekBar brScroll, conScroll;
 	private CharSequence brT1, brT2, conT;
-	private ImageView iv;
 	private int initBright, currBright;
 	private int newVal, currVal;
-	private boolean busy;
+	private float currCon, newCon;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.brightness_contrast);
-        cm = ContentManager.getContentManager();
         iv = (ImageView) findViewById(R.id.brightnessContrastImageView);
         cm.getNewImage(iv);
-        busy = false;
-        //TODO change the logic of getgraybrightness
-        initBright = Native.GetBrightness(cm.getNewImage());
+        
         brScroll = (SeekBar) findViewById(R.id.brightnessSeekBar);
         brText1 = (TextView) findViewById(R.id.brightnessText1);
         brText2 = (TextView) findViewById(R.id.brightnessText2);
@@ -40,9 +33,6 @@ public class BrightnessContrast extends Activity {
         brT1 = brText1.getText();
         brT2 = brText2.getText();
         conT = conText.getText();
-        brText1.setText(brT1 + " " + 0 + "\t");
-        brText2.setText(brT2 + " " + initBright);
-        conText.setText(conT + " " + 1);
         
         brScroll.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			@Override
@@ -64,80 +54,54 @@ public class BrightnessContrast extends Activity {
 			@Override
 			public void onStopTrackingTouch(SeekBar arg0) {}
         });
-        //brightness(255);
+        
+        reset();
 }
 
 	protected void brightness(int val) {
-		val -= 255;
-		brText1.setText(brT1 + " " + val + "\n");
-		newVal = val;
-		if(!busy) {
-			busy = true;
-			(new Thread() {
-				public void run() {
-					threadBrightness();
-				}
-			}).start();
-		}
+		newVal = val - 255;
+		doProcess();
 	}
-	
-	protected void threadBrightness() {
+
+	protected void contrast(int val) {
+		newCon = val/100.0f;
+		doProcess();
+	}
+
+	@Override
+	public void processImage(Bitmap bm) {
 		currVal = newVal;
-		//TODO modify this to change colored images
-		Native.ModBrightness(cm.getNewImage(), currVal);
-		
-		//TODO mod
-		currBright = Native.GetBrightness(cm.getImage());
-		
-		cm.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				finishBrightness();
-			}
-		});
+		currCon = newCon;
+		Native.ModContrast(bm, currCon);
+		Native.ModBrightness(bm, currVal);
+		currBright = Native.GetBrightness(bm);
 	}
-	
-	//this may look like it has race conditions, but this is the GUI thread
-	protected void finishBrightness() {
+
+	@Override
+	public void reset() {
+		initBright = Native.GetBrightness(cm.getNewImage());
+		currCon = newCon = 1.0f;
+		currVal = newVal = 0;
+	    brText1.setText(brT1 + " " + 0 + "\t");
+	    brText2.setText(brT2 + " " + initBright);
+	    conText.setText(conT + " " + 1);
+	    brScroll.setProgress(255);
+	    conScroll.setProgress(100);
+	}
+
+	@Override
+	protected void firstUpdateUi() {
+		brText1.setText(brT1 + " " + newVal + "\t");
+		conText.setText(conT + " " + newCon);
+	}
+
+	@Override
+	protected void lastUpdateUi() {
 		brText2.setText(brT2 + " " + currBright);
 		cm.setImage(iv);
-		if(currVal != newVal) {
-			(new Thread() {
-				public void run() {
-					threadBrightness();
-				}
-			}).start();
-		}
+		if(currVal != newVal || currCon != newCon)
+			contin = true;
 		else
-			busy = false;
+			contin = false;
 	}
-
-	protected void contrast(int oldVal) {
-		//TODO this needs to reflect the change in brightness also (and vice versa)
-		float val = oldVal/100.0f;
-		conText.setText(conT + " " + val);
-	}
-	
-	public void OnActivityResult(int requestCode, int resultCode, Intent i) {
-		if(requestCode == ContentManager.LOCATION && resultCode == Activity.RESULT_OK) {
-			String filename = (String)i.getExtras().get("filename");
-			cm.save(filename);
-		}
-	}
-
-	public void save(View view) {
-        cm.save();
-	}
- 
-    public void saveAs(View view) {
-    	cm.saveAs(this);
-    }
- 
-    public void video(View view) {
-    	//TODO
-    }
- 
-    public void videoServer(View view) {
-    	//TODO
-    }
 }
