@@ -15,13 +15,13 @@ public class Alg extends Activity {
         setContentView(R.layout.alg);
     }
  
-    public void toAlg1(View view) {
+    public void toBrCon(View view) {
          Intent i = new Intent(this, BrightnessContrast.class);
          this.startActivity(i);
          this.finish();
     }
  
-    public void toAlg2(View view) {
+    public void toInvert(View view) {
          Intent i = new Intent(this, Invert.class);
          this.startActivity(i);
          this.finish();

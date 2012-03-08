@@ -3,25 +3,8 @@
 	android:orientation="vertical"
 	android:layout_height="fill_parent"
 	android:layout_width="fill_parent"
+	android:id="@+id/mainLL"
 	xmlns:android="http://schemas.android.com/apk/res/android">
-	
-    <LinearLayout
-		android:orientation="vertical"
-		android:layout_height="fill_parent"
-		android:layout_width="fill_parent"
-		android:layout_weight="0.3"
-		android:id="@+id/linearLayout1" >
-	    
-	    <ImageView
-	        android:src="@drawable/ic_launcher"
-		    android:layout_height="fill_parent"
-		    android:layout_width="fill_parent"
-		    android:id="@+id/mainImageView"
-		    android:layout_gravity="center_horizontal|top"
-		    android:contentDescription="@string/def"
-		    android:layout_weight="0.30"/>
-	    
-    </LinearLayout>
 	
 	<LinearLayout
 	    android:orientation="horizontal"

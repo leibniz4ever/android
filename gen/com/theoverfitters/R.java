@@ -20,7 +20,7 @@ public final class R {
         public static final int loading2=0x7f020001;
     }
     public static final class id {
-        public static final int brightnessContrastImageView=0x7f060000;
+        public static final int brConLL=0x7f060000;
         public static final int brightnessSeekBar=0x7f060001;
         public static final int brightnessText1=0x7f060002;
         public static final int brightnessText2=0x7f060003;
@@ -30,14 +30,13 @@ public final class R {
         public static final int buttonVideoServer=0x7f06000a;
         public static final int contrastSeekBar=0x7f060004;
         public static final int contrastText=0x7f060005;
-        public static final int grayscale=0x7f06000e;
-        public static final int invert=0x7f06000d;
-        public static final int invertImageView=0x7f06000c;
-        public static final int linearLayout1=0x7f06000b;
+        public static final int grayscale=0x7f06000d;
+        public static final int invert=0x7f06000c;
+        public static final int invertLL=0x7f06000b;
         public static final int linearLayout3=0x7f060006;
-        public static final int mainImageView=0x7f06000f;
-        public static final int saveAsText=0x7f060011;
-        public static final int saveAsWarning=0x7f060010;
+        public static final int mainLL=0x7f06000e;
+        public static final int saveAsText=0x7f060010;
+        public static final int saveAsWarning=0x7f06000f;
     }
     public static final class layout {
         public static final int alg=0x7f030000;

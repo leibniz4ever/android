@@ -21,188 +21,288 @@ struct rgba {
 #define pixel struct rgba
 
 //#define getGray(color) (0.3f * color.red + 0.59f*color.green + 0.11f*color.blue)
-#define getGray(color) (color.red + color.green + color.blue)/3
-pixel inline getColored(unsigned char gray) {
+unsigned char getGray(pixel color) {
+  short temp = color.red;
+  temp += color.green + color.blue;
+  temp /= 3;
+  return (unsigned char)temp;
+}
+
+pixel getColored(unsigned char gray) {
   pixel pix;
   pix.red = pix.green = pix.blue = gray;
   return pix;
 }
 
-jint Java_com_overfitters_Native_ColorToGray(JNIEnv *env, jobject thiz, jobject color) {
+int getWidth(JNIEnv *env, jobject bitmap) {
   AndroidBitmapInfo info;
+  AndroidBitmap_getInfo(env, bitmap, &info);
+  return info.width;
+}
+
+int getHeight(JNIEnv *env, jobject bitmap) {
+  AndroidBitmapInfo info;
+  AndroidBitmap_getInfo(env, bitmap, &info);
+  return info.height;
+}
+
+pixel *getPixels(JNIEnv *env, jobject bitmap) {
   void *pixelsP;
-  pixel *pixels;
+  AndroidBitmap_lockPixels(env, bitmap, &pixelsP);
+  return (pixel *)pixelsP;
+}
+
+void freePixels(JNIEnv *env, jobject bitmap) {
+  AndroidBitmap_unlockPixels(env, bitmap);
+}
+
+jint Java_com_overfitters_Native_Compress(JNIEnv *env, jobject thiz, jobject imu, jobject mut) {
+  pixel *pixelsI, *pixelsM;
+  int widthI, heightI, widthM, heightM;
+  
+  widthI = getWidth(env, imu);
+  heightI = getHeight(env, imu);
+
+  widthM = getWidth(env, mut);
+  heightM = getHeight(env, mut);
+    
+  pixelsI = getPixels(env, imu);
+  pixelsM = getPixels(env, mut);
+
+  int scale = widthI/widthM;
+  if(heightI/heightM != scale)
+    return -1;
+
+  int eX,eY;
+  eX = widthI%scale;
+  eY = heightI%scale;
+
+  eX/=2;
+  eY/=2;
+
+  //TODO, make a library call instead
+  int i,j;
+  for(i = 0; i<widthM; i++) {
+    for(j = 0; j<heightM; j++) {
+      int red, green, blue;
+      red = green = blue = 0;
+      int m,n;
+      for(m = 0; m<scale; m++) {
+	for(n = 0; n<scale; n++) {
+	  int index = (scale*i+m+eX)+(scale*j+n+eY)*widthI;
+	  red += pixelsI[index].red;
+	  green += pixelsI[index].green;
+	  blue += pixelsI[index].blue;
+	}
+      }
+      red /= (scale*scale);
+      green /= (scale*scale);
+      blue /= (scale*scale);
+      pixelsM[i+j*widthM].red = red;
+      pixelsM[i+j*widthM].green = green;
+      pixelsM[i+j*widthM].blue = blue;
+      pixelsM[i+j*widthM].alpha = 0xff;
+    }
+  }
+
+  freePixels(env, imu);
+  freePixels(env, mut);
+
+  return 0;
+}
+
+jint Java_com_overfitters_Native_Copy(JNIEnv *env, jobject thiz, jobject imu, jobject mut) {
+  pixel *pixelsI, *pixelsM;
   int width, height;
   
-  if (AndroidBitmap_getInfo(env, color, &info) < 0) {
-    return -1;
-  }
+  width = getWidth(env, imu);
+  height = getHeight(env, imu);
   
-  if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-    return -2;
-  }
-  
-  width = info.width;
-  height = info.height;
-    
-  AndroidBitmap_lockPixels(env, color, &pixelsP);
+  pixelsI = getPixels(env, imu);
+  pixelsM = getPixels(env, mut);
 
-  pixels = (pixel *)pixelsP;
-
+  //TODO, make a library call instead
   pixel pix;
   int i,j;
   for(i = 0; i<width; i++) {
     for(j = 0; j<height; j++) {
-      pixels[i+j*width] = getColored((unsigned char)getGray(pixels[i+j*width]));
+      pixelsM[i+j*width] = pixelsI[i+j*width];
+      pixelsM[i+j*width].alpha = 0xff;
     }
   }
 
-  AndroidBitmap_unlockPixels(env, color);
+  freePixels(env, imu);
+  freePixels(env, mut);
 
   return 0;
 }
 
-jint Java_com_overfitters_Native_GetBrightness(JNIEnv *env, jobject thiz, jobject bitmap)
-{
-  AndroidBitmapInfo info;
-  void *pixelsP;
+jint Java_com_overfitters_Native_ColorToGray(JNIEnv *env, jobject thiz, jobject imu, jobject mut) {
+  pixel *pixelsI, *pixelsM;
+  int width, height;
+  
+  width = getWidth(env, imu);
+  height = getHeight(env, imu);
+    
+  pixelsI = getPixels(env, imu);
+  pixelsM = getPixels(env, mut);
+
+  //TODO, make a library call instead
+  int i,j;
+  for(i = 0; i<width; i++) {
+    for(j = 0; j<height; j++) {
+      pixelsM[i+j*width] = getColored(getGray(pixelsI[i+j*width]));
+    }
+  }
+
+  freePixels(env, imu);
+  freePixels(env, mut);
+
+  return 0;
+}
+
+jint Java_com_overfitters_Native_GetBrightness(JNIEnv *env, jobject thiz, jobject mut) {
   pixel *pixels;
   int width, height;
+  
+  width = getWidth(env, mut);
+  height = getHeight(env, mut);
     
-  if (AndroidBitmap_getInfo(env, bitmap, &info) < 0) {
-    return -1;
-  }
+  pixels = getPixels(env, mut);
 
-  if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-    return -2;
-  }
-
-  width = info.width;
-  height = info.height;
-
-  AndroidBitmap_lockPixels(env, bitmap, &pixelsP);
-
-  pixels = (pixel *)pixelsP;
-
+  //TODO, make a library call instead
   long sum = 0;
-  int i;
-  for(i = 0; i<width*height; i++) {
-    sum += getGray(pixels[i]);
-  }
-  sum/=(width*height);
-
-  jint ret = (jint)sum;
-
-  AndroidBitmap_unlockPixels(env, bitmap);
-
-  return ret;
-}
-
-jint Java_com_overfitters_Native_InvertColored(JNIEnv *env, jobject thiz, jobject color) {
-  AndroidBitmapInfo info;
-  void *pixelsP;
-  unsigned int *pixels;
-  int width, height;
-    
-  if (AndroidBitmap_getInfo(env, color, &info) < 0) {
-    return -1;
-  }
-
-  if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-    return -2;
-  }
-
-  width = info.width;
-  height = info.height;
-
-  AndroidBitmap_lockPixels(env, color, &pixelsP);
-
-  pixels = (unsigned int *)pixelsP;
-
   int i,j;
   for(i = 0; i<width; i++) {
     for(j = 0; j<height; j++) {
-      pixels[i+j*width] ^= 0x00ffffff;
+      sum+= getGray(pixels[i+j*width]);
     }
   }
 
-  AndroidBitmap_unlockPixels(env, color);
+  sum/=width*height;
+
+  freePixels(env, mut);
+
+  return sum;
+}
+
+jint Java_com_overfitters_Native_InvertColored(JNIEnv *env, jobject thiz, jobject imu, jobject mut) {
+  unsigned int *pixelsI, *pixelsM;
+  int width, height;
+  
+  width = getWidth(env, imu);
+  height = getHeight(env, imu);
+    
+  pixelsI = (unsigned int *)getPixels(env, imu);
+  pixelsM = (unsigned int *)getPixels(env, mut);
+
+  //TODO, make a library call instead
+  int i,j;
+  for(i = 0; i<width; i++) {
+    for(j = 0; j<height; j++) {
+      pixelsM[i+j*width] = pixelsI[i+j*width] ^ 0x00ffffff;
+    }
+  }
+
+  freePixels(env, imu);
+  freePixels(env, mut);
 
   return 0;
 }
 
-jint Java_com_overfitters_Native_InvertGray(JNIEnv *env, jobject thiz, jobject bitmap)
-{
-  AndroidBitmapInfo info;
-  void *pixelsP;
-  pixel *pixels;
+jint Java_com_overfitters_Native_InvertGray(JNIEnv *env, jobject thiz, jobject imu, jobject mut) {
+  pixel *pixelsI, *pixelsM;
   int width, height;
+  
+  width = getWidth(env, imu);
+  height = getHeight(env, imu);
     
-  if (AndroidBitmap_getInfo(env, bitmap, &info) < 0) {
-    return -1;
-  }
+  pixelsI = getPixels(env, imu);
+  pixelsM = getPixels(env, mut);
 
-  if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-    return -2;
-  }
-
-  width = info.width;
-  height = info.height;
-
-  AndroidBitmap_lockPixels(env, bitmap, &pixelsP);
-
-  pixels = (pixel *)pixelsP;
-
+  //TODO, make a library call instead
   int i,j;
   for(i = 0; i<width; i++) {
     for(j = 0; j<height; j++) {
-      pixels[i+j*width] = getColored(0xff ^ (unsigned char)getGray(pixels[i+j*width]));
+      pixelsM[i+j*width] = getColored(0xff^getGray(pixelsI[i+j*width]));
     }
   }
 
-  AndroidBitmap_unlockPixels(env, bitmap);
+  freePixels(env, imu);
+  freePixels(env, mut);
 
   return 0;
 }
 
-void inline modGray(unsigned char *color, int alpha) {
-  *color = (*color+alpha > 255 ? 255 : (*color+alpha < 0 ? 0 : *color+alpha));
-}
-void inline modBright(pixel *pix, int alpha) {
-  modGray(&pix->red,alpha);
-  modGray(&pix->green,alpha);
-  modGray(&pix->blue,alpha);
+unsigned char modBr(unsigned char color, int alpha) {
+  short tmp = color;
+  tmp += alpha;
+  if(tmp < 0)
+    tmp = 0;
+  else if(tmp > 255)
+    tmp = 255;
+  return (unsigned char)tmp;
 }
 
-jint Java_com_overfitters_Native_ModBrightness(JNIEnv *env, jobject thiz, jobject bitmap, jint change)
-{
-  AndroidBitmapInfo info;
-  void *pixelsP;
-  pixel *pixels;
+pixel modBrightness(pixel in, int alpha) {
+  in.red = modBr(in.red, alpha);
+  in.green = modBr(in.green, alpha);
+  in.blue = modBr(in.blue, alpha);
+  return in;
+}
+
+jint Java_com_overfitters_Native_ModBrightness(JNIEnv *env, jobject thiz, jobject imu, jobject mut, jint alpha) {
+  pixel *pixelsI, *pixelsM;
   int width, height;
+  int change = (int)alpha;
+  
+  width = getWidth(env, imu);
+  height = getHeight(env, imu);
     
-  if (AndroidBitmap_getInfo(env, bitmap, &info) < 0) {
-    return -1;
+  pixelsI = getPixels(env, imu);
+  pixelsM = getPixels(env, mut);
+
+  //TODO, make a library call instead
+  pixel pix;
+  int i,j;
+  for(i = 0; i<width; i++) {
+    for(j = 0; j<height; j++) {
+      pixelsM[i+j*width] = modBrightness(pixelsI[i+j*width], change);
+    }
   }
 
-  if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-    return -2;
+  freePixels(env, imu);
+  freePixels(env, mut);
+
+  return 0;
+}
+
+//not done
+jint Java_com_overfitters_Native_ModContrast(JNIEnv *env, jobject thiz, jobject imu, jobject mut) {
+  pixel *pixelsI, *pixelsM;
+  int width, height;
+  
+  width = getWidth(env, imu);
+  height = getHeight(env, imu);
+    
+  pixelsI = getPixels(env, imu);
+  if(imu != mut)
+    pixelsM = getPixels(env, mut);
+  else
+    pixelsM = pixelsI;
+
+  //TODO, make a library call instead
+  pixel pix;
+  int i,j;
+  for(i = 0; i<width; i++) {
+    for(j = 0; j<height; j++) {
+      pixelsM[i+j*width] = pixelsI[i+j*width];
+    }
   }
 
-  width = info.width;
-  height = info.height;
-  int alpha = (int)change;
-
-  AndroidBitmap_lockPixels(env, bitmap, &pixelsP);
-
-  pixels = (pixel *)pixelsP;
-
-  int i;
-  for(i = 0; i<width*height; i++) {
-    modBright(&pixels[i],alpha);
-  }
-
-  AndroidBitmap_unlockPixels(env, bitmap);
+  freePixels(env, imu);
+  if(imu != mut)
+    freePixels(env, mut);
 
   return 0;
 }

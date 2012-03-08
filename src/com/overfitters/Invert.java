@@ -5,65 +5,68 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.ImageView;
  
 public class Invert extends ImageProcessor {
-    private ImageView iv;
     private CheckBox invert,grayscale;
+    private boolean inverted, gray;
 
-	/** Called when the activity is first created. */
+	/** Called when the activity is first created. On GUI*/
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.invert);
-        iv = (ImageView) findViewById(R.id.invertImageView);
-        cm.getNewImage(iv);
+        super.onCreate(savedInstanceState, R.layout.invert, R.id.invertLL);
 
     	invert = (CheckBox) findViewById(R.id.invert);
     	grayscale = (CheckBox) findViewById(R.id.grayscale);
     	
     	reset();
+    	
+    	invert(null);
     }
     
-    //called by either checkbox
+    //called by either checkbox on GUI
     public void invert(View view) {
     	doProcess();
     }
 
+    //not on GUI
 	@Override
-	public void processImage(Bitmap bm) {
-		if(invert.isChecked()) {
-    		if(grayscale.isChecked()) {
-    			Native.InvertGray(bm);
+	public void processImage(Bitmap imu, Bitmap mut) {
+		if(inverted = invert.isChecked()) {
+    		if(gray = grayscale.isChecked()) {
+    			Native.InvertGray(imu, mut);
     		}
     		else {
-    			Native.InvertColored(bm);
+    			Native.InvertColored(imu, mut);
     		}
     	}
     	else {
-    		if(grayscale.isChecked()) {
-    			Native.ColorToGray(bm);
+    		if(gray = grayscale.isChecked()) {
+    			Native.ColorToGray(imu, mut);
     		}
     		else {
-    			//do nothing
+    			Native.Copy(imu, mut);
     		}
     	}
 	}
 
+	//on GUI
 	@Override
 	public void reset() {
 		invert.setChecked(false);
 		grayscale.setChecked(false);
+		inverted = false;
+		gray = false;
 	}
 
+	//on GUI
 	@Override
 	protected void firstUpdateUi() {
 		//nothing
 	}
 
+	//on GUI
 	@Override
-	protected void lastUpdateUi() {
-		cm.setImage(iv);
-		contin = false;
+	protected boolean lastUpdateUi() {
+		return invert.isChecked() != inverted || grayscale.isChecked() != gray;
 	}
 }

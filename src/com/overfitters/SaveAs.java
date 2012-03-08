@@ -10,7 +10,7 @@ import android.widget.TextView;
 public class SaveAs extends Activity {
 	TextView tb;
 	
-    /** Called when the activity is first created. */
+    /** Called when the activity is first created. On GUI*/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +19,7 @@ public class SaveAs extends Activity {
         tb = (TextView) findViewById(R.id.saveAsWarning);
     }
     
+    //On GUI
     public void ok(View view) {
     	String filename = ((EditText)findViewById(R.id.saveAsText)).getText().toString();
     	if(ContentManager.getContentManager().saveTo(filename))
@@ -27,6 +28,7 @@ public class SaveAs extends Activity {
     		tb.setText("Invalid filename!");
     }
     
+    //On GUI
     public void cancel(View view) {
     	finish();
     }

@@ -21,7 +21,7 @@
             <Button
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:onClick="toAlg1"
+                android:onClick="toBrCon"
                 android:text="@string/brightnessContrast"/>
         </LinearLayout>
         <LinearLayout
@@ -36,7 +36,7 @@
             <Button
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:onClick="toAlg2"
+                android:onClick="toInvert"
                 android:text="@string/invertImage"/>
         </LinearLayout>
     </LinearLayout>

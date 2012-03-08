@@ -3,13 +3,11 @@ package com.overfitters;
 import com.theoverfitters.R;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
  
 public class BrightnessContrast extends ImageProcessor {
-	private ImageView iv;
 	private TextView brText1, brText2, conText;
 	private SeekBar brScroll, conScroll;
 	private CharSequence brT1, brT2, conT;
@@ -20,10 +18,22 @@ public class BrightnessContrast extends ImageProcessor {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState,R.layout.brightness_contrast,R.id.brConLL);
+        /*
         setContentView(R.layout.brightness_contrast);
         iv = (ImageView) findViewById(R.id.brightnessContrastImageView);
         cm.getNewImage(iv);
+        int wid = cm.getWidth();
+        int hei = cm.getHeight();
+        iv.setMinimumHeight(hei);
+        iv.setMaxHeight(hei);
+        iv.setMinimumWidth(wid);
+        iv.setMaxWidth(wid);
+        Drawable draw = iv.getDrawable();
+        Rect bounds;
+        bounds = new Rect(0,0,wid,hei);
+		draw.setBounds(bounds);
+		*/
         
         brScroll = (SeekBar) findViewById(R.id.brightnessSeekBar);
         brText1 = (TextView) findViewById(R.id.brightnessText1);
@@ -69,17 +79,17 @@ public class BrightnessContrast extends ImageProcessor {
 	}
 
 	@Override
-	public void processImage(Bitmap bm) {
+	public void processImage(Bitmap imu, Bitmap mut) {
 		currVal = newVal;
 		currCon = newCon;
-		Native.ModContrast(bm, currCon);
-		Native.ModBrightness(bm, currVal);
-		currBright = Native.GetBrightness(bm);
+		Native.ModContrast(imu, mut, currCon);
+		Native.ModBrightness(imu, mut, currVal);
+		currBright = Native.GetBrightness(mut);
 	}
 
 	@Override
 	public void reset() {
-		initBright = Native.GetBrightness(cm.getNewImage());
+		initBright = Native.GetBrightness(cm.getImage());
 		currCon = newCon = 1.0f;
 		currVal = newVal = 0;
 	    brText1.setText(brT1 + " " + 0 + "\t");
@@ -96,12 +106,8 @@ public class BrightnessContrast extends ImageProcessor {
 	}
 
 	@Override
-	protected void lastUpdateUi() {
+	protected boolean lastUpdateUi() {
 		brText2.setText(brT2 + " " + currBright);
-		cm.setImage(iv);
-		if(currVal != newVal || currCon != newCon)
-			contin = true;
-		else
-			contin = false;
+		return currVal != newVal || currCon != newCon;
 	}
 }
